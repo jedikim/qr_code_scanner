@@ -31,16 +31,18 @@ class _QRViewExampleState extends State<QRViewExample> {
         children: <Widget>[
           Expanded(
             flex: 4,
-            child: QRView(
+            child : Stack (
+              children: <Widget>[
+              QRView(
               key: qrKey,
               onQRViewCreated: _onQRViewCreated,
-              overlay: QrScannerOverlayShape(
-                borderColor: Colors.red,
-                borderRadius: 10,
-                borderLength: 30,
-                borderWidth: 10,
-                cutOutSize: 300,
-              ),
+            ),
+                Container(
+                  color: Colors.pink,
+                  height: 150.0,
+                  width: 150.0,
+                )
+            ],
             ),
           ),
           Expanded(

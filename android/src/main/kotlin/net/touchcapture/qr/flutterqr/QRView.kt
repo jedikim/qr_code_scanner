@@ -14,6 +14,7 @@ import android.hardware.Camera.CameraInfo
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.BarcodeView
+import com.journeyapps.barcodescanner.Size
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
@@ -98,6 +99,7 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
     private fun resumeCamera() {
         if (!barcodeView!!.isPreviewActive) {
             barcodeView?.resume()
+
         }
     }
 
@@ -108,13 +110,16 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
 
     override fun getView(): View {
         return initBarCodeView()?.apply {
+            //barcodeView?.framingRectSize = Size(10000,10000)
             resume()
+            barcodeView?.framingRectSize = Size(10000,10000)
         }!!
     }
 
     private fun initBarCodeView(): BarcodeView? {
         if (barcodeView == null) {
             barcodeView = createBarCodeView()
+
         }
         return barcodeView
     }
@@ -130,6 +135,8 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
                     override fun possibleResultPoints(resultPoints: List<ResultPoint>) {}
                 }
         )
+        //barcode?.framingRectSize = Size(10000,10000)
+        //barcode?.marginFraction = 0.1
         return barcode
     }
 
