@@ -23,7 +23,7 @@ public class QRView:NSObject,FlutterPlatformView {
     func isCameraAvailable(success: Bool) -> Void {
         if success {
             do {
-                try scanner?.startScanning(resultBlock: { [weak self] codes in
+                try scanner?.startScanning(with: .front, resultBlock: { [weak self] codes in
                     if let codes = codes {
                         for code in codes {
                             guard let stringValue = code.stringValue else { continue }
@@ -78,9 +78,13 @@ public class QRView:NSObject,FlutterPlatformView {
     
     func toggleFlash(){
         if let sc: MTBBarcodeScanner = scanner {
-            if sc.hasTorch() {
+            //if sc.hasTorch() {
+ //               sc.flipCamera()
+//                usleep(500000)
                 sc.toggleTorch()
-            }
+                usleep(50000)
+                sc.toggleTorch()
+            //}
         }
     }
     
