@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_flashlight/flutter_flashlight.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 void main() {
@@ -144,12 +147,48 @@ class _QRViewExampleState extends State<QRViewExample> {
   bool _isBackCamera(String current) {
     return backCamera == current;
   }
-
-  void _onQRViewCreated(QRViewController controller) {
+  Future<void> onStop() async {
+    print('onStop');
+    //Flashlight.lightOn();
+    Flashlight.lightOff();
+    //controller.toggleFlash();
+    //await Future.delayed(Duration(milliseconds: 1000), (){this.controller.flipCamera(); });
+    await Future.delayed(Duration(milliseconds: 2000), (){ qrText = '';});
+    //await Future.delayed(Duration(milliseconds: 600), (){ this.controller.flipCamera();});
+//    this.controller.flipCamera();
+//    this.controller.toggleFlash();
+  }
+  Future<void> onStart() async {
+    print('onStart');
+    //Flashlight.lightOn();
+    Flashlight.lightOn();
+    //controller.toggleFlash();
+    //await Future.delayed(Duration(milliseconds: 1000), (){this.controller.flipCamera(); });
+    await Future.delayed(Duration(milliseconds: 10), (){ onStop();});
+    //await Future.delayed(Duration(milliseconds: 600), (){ this.controller.flipCamera();});
+//    this.controller.flipCamera();
+//    this.controller.toggleFlash();
+  }
+  void _onQRViewCreated(QRViewController controller) async {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
       setState(() {
-        qrText = scanData;
+        if (qrText == '') {
+          //
+          //controller?.pauseCamera();
+          qrText = scanData;
+          //controller.flipCamera();
+          onStart();
+          //Flashlight.lightOn();
+          //controller.toggleFlash();
+          //Vibration.vibrate(duration: 200);
+
+
+          //controller.toggleFlash();
+
+          //onStop();
+
+        }
       });
     });
   }

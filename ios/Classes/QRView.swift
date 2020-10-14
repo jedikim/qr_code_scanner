@@ -81,9 +81,9 @@ public class QRView:NSObject,FlutterPlatformView {
             //if sc.hasTorch() {
  //               sc.flipCamera()
 //                usleep(500000)
-                sc.toggleTorch()
+//                sc.toggleTorch()
                 usleep(50000)
-                sc.toggleTorch()
+//                sc.toggleTorch()
             //}
         }
     }

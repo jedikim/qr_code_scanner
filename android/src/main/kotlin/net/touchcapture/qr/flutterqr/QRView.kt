@@ -1,9 +1,9 @@
 package net.touchcapture.qr.flutterqr
-
+import kotlin.concurrent.schedule
 import android.Manifest
 import android.app.Activity
 import android.app.Application
-import android.content.Context
+import android.os.Handler;
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
@@ -11,14 +11,19 @@ import android.os.Bundle
 import android.view.View
 import com.google.zxing.ResultPoint
 import android.hardware.Camera.CameraInfo
+import android.hardware.camera2.CameraManager
+//import android.hardware.camera2.CameraManager
+import androidx.core.content.ContextCompat.getSystemService
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import com.journeyapps.barcodescanner.BarcodeView
 import com.journeyapps.barcodescanner.Size
+//import com.journeyapps.barcodescanner.camera.CameraManager
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.platform.PlatformView
+import java.util.*
 
 class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
         PlatformView,MethodChannel.MethodCallHandler {
@@ -33,12 +38,13 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
     var requestingPermission = false
     private var isTorchOn: Boolean = false
     val channel: MethodChannel
-
+    private lateinit var cameraManager: CameraManager
     init {
         registrar.addRequestPermissionsResultListener(CameraRequestPermissionsListener())
         channel = MethodChannel(registrar.messenger(), "net.touchcapture.qr.flutterqr/qrview_$id")
         channel.setMethodCallHandler(this)
         checkAndRequestPermission(null)
+//        this.
         registrar.activity().application.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
             override fun onActivityPaused(p0: Activity?) {
                 if (p0 == registrar.activity()) {
@@ -83,10 +89,7 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
     }
 
     private fun toggleFlash() {
-        if (hasFlash()) {
-            barcodeView?.setTorch(!isTorchOn)
-            isTorchOn = !isTorchOn
-        }
+
 
     }
 
@@ -119,7 +122,11 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
     private fun initBarCodeView(): BarcodeView? {
         if (barcodeView == null) {
             barcodeView = createBarCodeView()
+            var settings = barcodeView?.cameraSettings
 
+            settings?.requestedCameraId = CameraInfo.CAMERA_FACING_FRONT
+
+            barcodeView?.cameraSettings = settings
         }
         return barcodeView
     }
@@ -157,7 +164,7 @@ class QRView(private val registrar: PluginRegistry.Registrar, id: Int) :
 
     private fun hasCameraPermission(): Boolean {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                activity.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                activity.checkSelfPermission(Manifest.permission.CAMERA) == PERMISSION_GRANTED
     }
 
 
