@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flashlight/flutter_flashlight.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
-void main() {
-  runApp(MaterialApp(home: QRViewExample()));
 
+void main() {
+  Flashlight.lightOn();
+  runApp(MaterialApp(home: QRViewExample()));
+  Flashlight.lightOn();
 }
 
 const flashOn = 'FLASH ON';
@@ -21,6 +23,7 @@ class QRViewExample extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => _QRViewExampleState();
+
 }
 
 class _QRViewExampleState extends State<QRViewExample> {
@@ -29,7 +32,7 @@ class _QRViewExampleState extends State<QRViewExample> {
   var cameraState = frontCamera;
   QRViewController controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-
+  //onStart();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,18 +70,9 @@ class _QRViewExampleState extends State<QRViewExample> {
                         margin: EdgeInsets.all(8),
                         child: RaisedButton(
                           onPressed: () {
-                            if (controller != null) {
-                              controller.toggleFlash();
-                              if (_isFlashOn(flashState)) {
-                                setState(() {
-                                  flashState = flashOff;
-                                });
-                              } else {
-                                setState(() {
-                                  flashState = flashOn;
-                                });
-                              }
-                            }
+                            //controller?.pauseCamera();
+                            onPrepare();
+
                           },
                           child:
                               Text(flashState, style: TextStyle(fontSize: 20)),
@@ -150,10 +144,10 @@ class _QRViewExampleState extends State<QRViewExample> {
   Future<void> onStop() async {
     print('onStop');
     //Flashlight.lightOn();
-    Flashlight.lightOff();
+    await Flashlight.lightOff();
     //controller.toggleFlash();
     //await Future.delayed(Duration(milliseconds: 1000), (){this.controller.flipCamera(); });
-    await Future.delayed(Duration(milliseconds: 2000), (){ qrText = '';});
+    await Future.delayed(Duration(milliseconds: 2000), (){ qrText = '';controller?.resumeCamera();});
     //await Future.delayed(Duration(milliseconds: 600), (){ this.controller.flipCamera();});
 //    this.controller.flipCamera();
 //    this.controller.toggleFlash();
@@ -161,7 +155,7 @@ class _QRViewExampleState extends State<QRViewExample> {
   Future<void> onStart() async {
     print('onStart');
     //Flashlight.lightOn();
-    Flashlight.lightOn();
+    await Flashlight.lightOn();
     //controller.toggleFlash();
     //await Future.delayed(Duration(milliseconds: 1000), (){this.controller.flipCamera(); });
     await Future.delayed(Duration(milliseconds: 10), (){ onStop();});
@@ -169,16 +163,31 @@ class _QRViewExampleState extends State<QRViewExample> {
 //    this.controller.flipCamera();
 //    this.controller.toggleFlash();
   }
+  Future<void> onPrepare() async {
+   // print('onStart');
+    //Flashlight.lightOn();
+//    await Flashlight.lightOn();
+    //controller.toggleFlash();
+    controller?.pauseCamera();
+    //await Future.delayed(Duration(milliseconds: 1000), (){this.controller.flipCamera(); });
+    await Future.delayed(Duration(milliseconds: 800), (){ onStart();});
+    //await Future.delayed(Duration(milliseconds: 600), (){ this.controller.flipCamera();});
+//    this.controller.flipCamera();
+//    this.controller.toggleFlash();
+  }
+  // ignore: avoid_void_async
   void _onQRViewCreated(QRViewController controller) async {
     this.controller = controller;
+    //await onStart();
     controller.scannedDataStream.listen((scanData) {
       setState(() {
         if (qrText == '') {
           //
-          //controller?.pauseCamera();
+
           qrText = scanData;
           //controller.flipCamera();
-          onStart();
+          onPrepare();
+          //onStart();
           //Flashlight.lightOn();
           //controller.toggleFlash();
           //Vibration.vibrate(duration: 200);
